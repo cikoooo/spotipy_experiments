@@ -1,2 +1,2 @@
 # spotipy_experiments
-Experimentation with Spotipy
+Experimentation with Spotipy [https://spotipy.readthedocs.io/en/latest/]
