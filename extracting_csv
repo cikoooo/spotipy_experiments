@@ -1,4 +1,5 @@
-# This code is used to extract track information from album Simulation Theory (super deluxe) by Muse
+#This code is used to extract track information from album Simulation Theory (super deluxe) by Muse
+
 
 import sys
 import spotipy
