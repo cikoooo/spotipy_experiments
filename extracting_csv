@@ -1,0 +1,167 @@
+# This code is used to extract track information from album Simulation Theory (super deluxe) by Muse
+
+import sys
+import spotipy
+import spotipy.util as util
+from spotipy.oauth2 import SpotifyClientCredentials #To access authorised Spotify data
+import csv
+import pandas
+
+# Data needed to extract data from web api
+# client id gained from spotify for developers
+username = 'xanonymouz'
+scope = 'user-library-read'
+client_id = 'e296b8c83de44818bf492a5715e7ed25'
+client_secret = '6a8b273ea90e437089a1fd3dd68ca158'
+redirect_uri = 'http://localhost/'
+
+
+client_credentials_manager = SpotifyClientCredentials(client_id=client_id, 
+                client_secret=client_secret)
+
+#spotify object to access API
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+#chosen artist
+name = "Muse" 
+
+#search query
+result = sp.search(name) 
+
+# test print
+#print(result['tracks']['items'][0]['artists'])
+
+artist_uri = result['tracks']['items'][0]['artists'][0]['uri']
+#test print
+#print(artist_uri)
+
+
+#Pull all of the artist's albums
+sp_albums = sp.artist_albums(artist_uri, album_type='album')
+
+#Store artist's albums' names' and uris in separate lists
+album_names = []
+album_uris = []
+for i in range(len(sp_albums['items'])):
+    album_names.append(sp_albums['items'][i]['name'])
+    album_uris.append(sp_albums['items'][i]['uri'])
+    
+
+albums = {}
+a = 0
+
+# create a dict for album names (keys are uris)
+for name in album_names:
+    uri = album_uris[a]
+    name = album_names[a]
+    albums[uri] = name
+    a += 1
+
+#test print
+e = 0
+for value in albums:
+    print(value, 'equals', albums[value], '|| album nro =', e)
+    e += 1
+
+
+#Valitsee levyn, 0 on tässä tapauksessa simulation theory (super deluxe)
+tracks = sp.album_tracks(album_uris[0])
+
+#Tulostaa levyn ensimmäisen biisin nimen, test print
+#print(tracks['items'][0]['name'])
+
+kappaleet = []
+
+#Tallentaa kaikki biisit levyltä
+for i in range(len(tracks['items'])):
+    track = tracks['items'][i]['name']
+    kappaleet.append(track)
+
+
+#Tallentaa kappaleiden tunnisteen
+kappaleet_id = []
+for i in range(len(tracks['items'])):
+    t_id = tracks['items'][i]['id']
+    kappaleet_id.append(t_id)
+
+kappaleet_dict = {}
+b = 0
+
+#Yhdistää kappaleiden tunnisteet ja nimet dict:iin
+for t_uri in kappaleet:
+    uri = kappaleet_id[b]
+    name = kappaleet[b]
+    kappaleet_dict[uri] = name
+    b += 1
+
+print()
+'''
+#Test print
+for value in kappaleet_dict:
+    print(value, 'equals', kappaleet_dict[value])
+'''
+print()
+
+#Spotipyn valmis funktio, jonka avulla voidaan tarkastaa kappaleen tietoja
+features = sp.audio_features(kappaleet_id)
+'''
+#test print
+for x in features:
+    print(x)
+'''
+tracks_features = []
+
+#Kappaleen tiedot järjestetään listaan
+for x in range(len(features)):
+    track_features = features[x]
+    tracks_features.append(track_features)
+'''
+#test print
+for x in tracks_features:
+    print(x)
+    print()
+'''
+#This will display the header aka the features
+header = []
+for x in tracks_features[0]:
+    header.append(x)
+
+finale_tracks = {}
+
+#Yhdistetään kappaleen tiedot kappaleeseen
+d = 0
+for x in kappaleet:
+    t_features = tracks_features[d]
+    name = kappaleet[d]
+    finale_tracks[name] = t_features
+    d += 1
+
+'''
+#test print
+for x in finale_tracks:
+    print(x, finale_tracks[x])
+    print()
+'''
+
+#This was used to create a csv containing track information
+with open('SPOTIPY.csv', mode='w') as csv_file:
+    fieldnames = header
+    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for row in finale_tracks:
+        writer.writerow(finale_tracks[row])
+    print('csv done')
+    print()
+
+df = pandas.read_csv('spotipy.csv')
+
+#Lisätään kappaleiden nimet dataframeen
+df['Title'] = kappaleet
+
+#Muutetaan dataframen indeksiksi laulun nimi
+df = df.set_index('Title')
+print(df.head())
+
+#Tallenna parannettu tiedosto csv:nä tarkasteltavaksi
+export = df.to_csv("spotify_muse.csv")
