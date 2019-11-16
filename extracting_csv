@@ -1,5 +1,11 @@
 #This code is used to extract track information from album Simulation Theory (super deluxe) by Muse
+'''
+You can use this to get any album's audio features from Spotify but you should change artist name
+and do some test prints as this saves the results to a csv. 
+If you want to change artist and album, I recommend you change everything after row 152 into a comment
+so you won't create unnecessary csv-files.
 
+'''
 
 import sys
 import spotipy
@@ -143,6 +149,7 @@ for x in finale_tracks:
     print(x, finale_tracks[x])
     print()
 '''
+
 
 #This was used to create a csv containing track information
 with open('SPOTIPY.csv', mode='w') as csv_file:
