@@ -18,8 +18,8 @@ import pandas
 # client id gained from spotify for developers
 username = 'xanonymouz'
 scope = 'user-library-read'
-client_id = 'e296b8c83de44818bf492a5715e7ed25'
-client_secret = '6a8b273ea90e437089a1fd3dd68ca158'
+client_id = ''
+client_secret = ''
 redirect_uri = 'http://localhost/'
 
 
